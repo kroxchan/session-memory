@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# install.sh — Install session-memory skill into ~/.cursor/skills/
+#
+# Usage:
+#   bash install.sh           # install (default)
+#   bash install.sh --uninstall
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SRC="$SCRIPT_DIR/skill"
+DEST="${HOME}/.cursor/skills/session-memory"
+MEMORY_ROOT="${MEMORY_ROOT:-/Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory}"
+
+ACTION="install"
+[[ "${1:-}" == "--uninstall" ]] && ACTION="uninstall"
+
+if [[ "$ACTION" == "uninstall" ]]; then
+  if [[ -L "$DEST" || -d "$DEST" ]]; then
+    rm -rf "$DEST"
+    echo "✓ removed $DEST"
+  else
+    echo "(not installed at $DEST)"
+  fi
+  echo "Note: memory data at $MEMORY_ROOT/sessions/ is NOT removed."
+  echo "To purge memory: rm -rf \"$MEMORY_ROOT/sessions\""
+  exit 0
+fi
+
+# ---- Install -----------------------------------------------------------------
+mkdir -p "$(dirname "$DEST")"
+
+if [[ -e "$DEST" || -L "$DEST" ]]; then
+  echo "→ existing install found at $DEST, removing…"
+  rm -rf "$DEST"
+fi
+
+# NOTE: Cursor's skill scanner does NOT follow symlinks, so we copy.
+# Re-run install.sh after editing the source skill to sync changes.
+if command -v rsync >/dev/null 2>&1; then
+  rsync -a --delete "$SRC/" "$DEST/"
+else
+  cp -R "$SRC" "$DEST"
+fi
+echo "✓ copied $SRC → $DEST"
+
+# Make scripts executable
+chmod +x "$SRC"/scripts/*.sh
+echo "✓ scripts made executable"
+
+# Ensure memory root exists
+mkdir -p "$MEMORY_ROOT/sessions"
+echo "✓ memory root: $MEMORY_ROOT/sessions/"
+
+# Add gitignore for sessions in SkillForge if missing
+SF_ROOT="$(dirname "$MEMORY_ROOT")"
+if [[ -d "$SF_ROOT/.git" ]] || [[ -f "$SF_ROOT/.gitignore" ]]; then
+  GI="$SF_ROOT/.gitignore"
+  if ! grep -q '^memory/sessions' "$GI" 2>/dev/null; then
+    echo 'memory/sessions/' >> "$GI"
+    echo "✓ added memory/sessions/ to $GI"
+  fi
+fi
+
+# Smoke test
+echo
+echo "=== smoke test ==="
+bash "$SRC/scripts/sm-project-key.sh" "$PWD"
+echo
+echo "Install complete. Restart Cursor to load the skill, or invoke via /session-memory."

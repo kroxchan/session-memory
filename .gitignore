@@ -1,0 +1,19 @@
+# Memory data (absolute paths, never commit)
+**/memory/sessions/
+
+# OS
+.DS_Store
+*.swp
+._*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.venv
+*.egg-info/
+dist/
+build/
+
+# Session memory runtime
+.sm/
