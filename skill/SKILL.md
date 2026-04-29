@@ -31,7 +31,7 @@ $MEMORY_ROOT/sessions/
             └── YYYY-MM-DD-<topic>.md
 ```
 
-`$MEMORY_ROOT` defaults to `/Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory` (shared with SkillForge, but isolated under `sessions/`).
+`$MEMORY_ROOT` defaults to `~/.cursor/session-memory/memory`. Can be overridden with the `MEMORY_ROOT` env var.
 
 ## Every turn — mandatory protocol
 
@@ -63,7 +63,7 @@ If the project is new (no `projects/<key>/` folder), `sm-bootstrap.sh` creates i
 Write to memory **immediately** (not batched, not at end-of-turn) when user input matches:
 
 | Signal | Target file | Example |
-|---|---|---|
+|--------|------------|---------|
 | Explicit instruction ("记住 X", "remember X", "以后都 Y", "from now on Y") | `requirements.md` | "All handlers must log traceID" |
 | Technical decision ("we'll use X instead of Y", "决定用 X") | `decisions.md` | "Use Redis, not Memcached, for session store" |
 | Project convention stated by user | `facts/<topic>.md` | API route pattern, naming scheme |
@@ -92,21 +92,19 @@ bash scripts/sm-write.sh \
   --body "<full markdown body>"
 ```
 
-## Memory conflict resolution (D2)
+## Memory conflict resolution
 
 When new decision contradicts old:
 - **Append** new entry with `★ CURRENT` marker and timestamp
 - **Strike** old entry with `~~...~~` + note reason: `<!-- superseded by 2026-04-23: 需求变更 -->`
 - **Never delete** — audit trail matters
 
-## Core overflow (D3)
+## Core overflow
 
 If `CORE.md` > 200 lines after write:
 1. Identify topic to evict (least recently referenced via INDEX lookup counts)
 2. Move that section to `facts/<topic>.md`
 3. Replace in CORE with a one-line pointer + add INDEX entry
-
-Done by `scripts/sm-compact-core.sh` — trigger manually or when Agent detects overflow.
 
 ## Lost-in-Middle mitigation
 
@@ -119,29 +117,20 @@ Following Liu et al. 2023:
 ## User commands
 
 | Command | Action |
-|---|---|
+|---------|--------|
 | `/remember <text>` | Append to project CORE.md |
 | `/recall <query>` | Run `scripts/sm-recall.sh <query>` — rg-based search across sessions/ + facts/ |
 | `/memory-scrub <pattern>` | Remove matching entries (for PII/secrets accidentally captured) |
 | `/memory-status` | Show project key, file sizes, last updated times |
 
-## Privacy (D5)
+## Privacy
 
-- `$MEMORY_ROOT/sessions/` is **gitignored by default** (the install script adds it)
+- `$MEMORY_ROOT/` has its own `.gitignore` (created by install.sh)
 - Never write API keys, tokens, passwords even if user pastes them
 - `/memory-scrub <regex>` provides on-demand cleanup
-
-## Interop with SkillForge
-
-This skill uses `$MEMORY_ROOT` = SkillForge's `memory/` directory but only under `sessions/`. It does not touch:
-- `capability-index.yaml` (SkillForge task calibration)
-- `reflections.md` (SkillForge failure reflections)
-- `self-made/`, `trajectories/`, `timings.yaml`
-
-**Write path**: memory writes go through `sm-write.sh` only — do **not** use `StrReplace` or `Write` directly on INDEX.md / CORE.md / L3 files, it bypasses atomic guarantees and INDEX sync.
 
 ## References (deeper context — load on demand)
 
 - `references/templates/INDEX.md.tpl` — new project index template
 - `references/templates/CORE.md.tpl` — new project core template
-- `references/design-notes.md` — design rationale (linked from PRD)
+- `references/design-notes.md` — design rationale

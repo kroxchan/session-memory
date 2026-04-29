@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-: "${MEMORY_ROOT:=/Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory}"
+: "${MEMORY_ROOT:=$HOME/.cursor/session-memory/memory}"
 
 PROJECT_KEY=""
 FILE=""

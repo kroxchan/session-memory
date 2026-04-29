@@ -10,10 +10,10 @@
 $MEMORY_ROOT/sessions/
 ```
 
-默认值（与 SkillForge 共用根目录）：
+默认值：
 
 ```
-/Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/
+~/.cursor/session-memory/memory/sessions/
 ```
 
 可通过环境变量 `MEMORY_ROOT` 覆盖。
@@ -23,32 +23,28 @@ $MEMORY_ROOT/sessions/
 ## 完整目录树
 
 ```
-$MEMORY_ROOT/
-└── sessions/
-    ├── _global/                        # 全局记忆（跨所有项目）
-    │   ├── INDEX.md                   # L1 · ≤30 行 · 每轮强制读
-    │   ├── CORE.md                   # L2 · ≤60 行 · 个人偏好/通用约定
-    │   └── facts/                    # L3 · 专题知识
-    │       └── tech-stack.md          # 我的常用工具栈
+~/.cursor/session-memory/memory/sessions/
+├── _global/                        # 全局记忆（跨所有项目）
+│   ├── INDEX.md                   # L1 · ≤30 行 · 每轮强制读
+│   ├── CORE.md                   # L2 · ≤60 行 · 个人偏好/通用约定
+│   └── facts/                    # L3 · 专题知识
+│       └── tech-stack.md
+│
+└── projects/                      # 按项目隔离
+    ├── 7verse-ug@a3f2e1b9/      # 项目名@md5前8位
+    │   ├── INDEX.md              # L1 · ≤50 行 · 每轮强制读
+    │   ├── CORE.md              # L2 · ≤200 行 · 项目约束+当前目标
+    │   ├── requirements.md      # L3 · 明确的需求
+    │   ├── decisions.md         # L3 · 技术决策
+    │   ├── facts/              # L3 · 专题知识
+    │   │   ├── api-conventions.md
+    │   │   └── auth-flow.md
+    │   └── sessions/           # L3 · 历史会话摘要
+    │       ├── 2026-04-23-linktree-api.md
+    │       └── 2026-04-22-auth-refactor.md
     │
-    └── projects/                      # 按项目隔离
-        ├── 7verse-ug@a3f2e1b9/      # 项目名@md5前8位
-        │   ├── INDEX.md              # L1 · ≤50 行 · 每轮强制读
-        │   ├── CORE.md              # L2 · ≤200 行 · 项目约束+当前目标
-        │   ├── requirements.md      # L3 · 明确的需求
-        │   ├── decisions.md         # L3 · 技术决策
-        │   ├── facts/              # L3 · 专题知识
-        │   │   ├── api-conventions.md
-        │   │   └── auth-flow.md
-        │   └── sessions/           # L3 · 历史会话摘要
-        │       ├── 2026-04-23-linktree-api.md
-        │       └── 2026-04-22-auth-refactor.md
-        │
-        ├── seedance-character-pipeline@c0b64168/
-        │   └── ...
-        │
-        └── another-project@1a2b3c4d/
-            └── ...
+    └── seedance-character-pipeline@c0b64168/
+        └── ...
 ```
 
 ---
@@ -62,7 +58,7 @@ $MEMORY_ROOT/
 格式规范：
 - 每个文件一行：`- <相对路径> — <≤30字摘要>`
 - 项目级 INDEX ≤50 行，全局 INDEX ≤30 行
-- 超过必须按类别拆分成多个文件
+- 超过必须按类别拆分
 
 示例：
 
@@ -94,7 +90,7 @@ $MEMORY_ROOT/
 格式规范：
 - 项目级 CORE ≤200 行，全局 CORE ≤60 行
 - 用 `[STICKY]` 标记关键约束（每 10 轮在对话末尾重放一次）
-- 正文按 section 组织，每个 section 最多 20 行
+- 正文按 section 组织
 
 示例：
 
@@ -118,7 +114,7 @@ $MEMORY_ROOT/
 
 ### L3 — 详情文件（按需读取）
 
-正文内容，按需加载。Agent 根据 INDEX 的指向决定是否读取。
+正文内容，Agent 根据 INDEX 的指向决定是否读取。
 
 ---
 
@@ -144,26 +140,6 @@ $MEMORY_ROOT/
 ~/work/client-7verse-ug/    → 7verse-ug ❌ 冲突！
 ```
 
-用 `basename@md5前8位`（如 `7verse-ug@a3f2e1b9`）保证唯一性，同时保留可读前缀方便人类识别。
+用 `basename@md5前8位`（如 `7verse-ug@a3f2e1b9`）保证唯一性，同时保留可读前缀。
 
 MD5 计算时取**完整绝对路径**，确保不同位置的同名目录也被区分。
-
----
-
-## 与 SkillForge 的目录关系
-
-```
-/Users/vivx/cursor/digital-human/skills/SKILLFORGE/
-├── memory/
-│   ├── capability-index.yaml   ← SkillForge L0 索引
-│   ├── reflections.md           ← SkillForge L2 反思
-│   ├── timings.yaml             ← SkillForge 执行时间
-│   ├── self-made/               ← SkillForge Forger 草稿
-│   ├── trajectories/            ← SkillForge 执行轨迹
-│   └── sessions/               ← Session Memory（本文档）
-│       ├── _global/
-│       └── projects/
-└── .gitignore                   ← sessions/ 已被忽略
-```
-
-**Session Memory 只操作 `sessions/` 子目录**，不碰 SkillForge 的其他文件。

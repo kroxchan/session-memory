@@ -46,10 +46,9 @@ Session Memory 的设计融合了 4 篇论文的核心思想，以及 Claude Cod
 
 > *Sarthi, P., et al. "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval." ICLR 2024. arXiv:2401.18059*
 
-**核心发现**：对长文档构建 collapsed tree（扁平化一次匹配）比 tree traversal（逐层下钻）在 QuALITY 基准上效果更好，且实现更简单。
+**核心发现**：collapsed tree（扁平化一次匹配）比 tree traversal（逐层下钻）在 QuALITY 基准上效果更好，且实现更简单。
 
 **对 Session Memory 的影响**：
-
 - 不用 embedding 聚类 + 递归索引——用文件系统目录做天然的两层抽象
 - `INDEX.md` 就是 collapsed tree，一次读完即知全局
 - 细节在 L3 文件里，按需读取
@@ -60,10 +59,9 @@ Session Memory 的设计融合了 4 篇论文的核心思想，以及 Claude Cod
 
 > *Gutiérrez, B. J., et al. "HippoRAG: Neurobiologically Inspired Long-Term Memory for LLMs." NeurIPS 2024. arXiv:2405.14831*
 
-**核心发现**：海马体索引理论——索引与内容分离，用稀疏索引实现单步多跳检索，比迭代检索快 6-13 倍、便宜 10-30 倍。
+**核心发现**：海马体索引理论——索引与内容分离，用稀疏索引实现单步多跳检索，比迭代检索快 6-13 倍。
 
 **对 Session Memory 的影响**：
-
 - `INDEX.md` = 稀疏索引（只存标题+摘要+路径，不含正文）
 - L3 文件 = 内容存储
 - Agent 先查索引，再按路径读取内容——两跳完成，不重复扫描
@@ -89,7 +87,7 @@ Session Memory 的设计融合了 4 篇论文的核心思想，以及 Claude Cod
 | D5 | 隐私（sessions/ 含敏感数据）| **强制 .gitignore** + Agent 不写入密钥 + `/memory-scrub` 命令 | Claude Code `.claude/agent-memory-local/` 模式 |
 | D6 | 索引层数 | **两层**（全局 INDEX + 项目 INDEX），不做 RAPTOR 完整树 | 项目规模小，collapsed tree 足够 |
 | D7 | 索引更新时机 | **同步更新**：`sm-write.sh` 原子写 tmp + rename，同时更新 INDEX 条目 | 避免 INDEX 与实际文件不一致 |
-| D8 | 为什么不用 embedding | **纯 `rg` 关键词搜索**：单用户 IDE 场景，<1000 条记忆，`rg` 毫秒级，无需向量 DB | PRD §4.2 |
+| D8 | 为什么不用 embedding | **纯 `rg` 关键词搜索**：单用户 IDE 场景，<1000 条记忆，`rg` 毫秒级，无需向量 DB | — |
 | D9 | 为什么用 Markdown 而非 YAML/JSON | **人类可读可改**、天然容纳自由格式、支持 git diff | PRD §4.3 |
 
 ---
@@ -106,15 +104,3 @@ Session Memory 的设计融合了 4 篇论文的核心思想，以及 Claude Cod
 | 适用规模 | 亿级文档 | <1000 条记忆（本场景）|
 
 结论：embedding 的优势在亿级文档才显现，我们的场景（单用户、单项目、<1000 条记忆）用文件系统 + 关键词搜索已经绑绑有余。
-
----
-
-## 为什么与 SkillForge 共用 memory/ 目录
-
-| 方案 | 优点 | 缺点 |
-|------|------|------|
-| 共用 memory/（当前）| 一次安装，两套记忆系统都可用 | 需要隔离 `sessions/` 子目录 |
-| 独立 memory/ | 完全隔离 | 两套系统记忆割裂，用户体验碎片化 |
-| 集成到 SkillForge | 单一系统 | SkillForge 是任务校准系统，与项目级记忆职责不同 |
-
-**当前方案最优**：两个系统职责正交（SkillForge = Agent 能力校准，Session Memory = 项目知识），共用根目录但隔离子目录，零冲突。

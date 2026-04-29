@@ -32,3 +32,10 @@ If user makes contradictory statements across turns:
 ## Why compress at 50% context not 70%?
 
 HumanLayer team's empirical finding (see Claude Code best practices): Agent performance noticeably degrades past 60-70% context ("dumb zone"). Compressing at 50% leaves headroom for the compression operation itself and avoids entering the dumb zone.
+
+## Why independent memory root?
+
+Storing memories in `~/.cursor/session-memory/memory/` (instead of co-locating with any other system) gives:
+- Complete autonomy — not tied to any other skill's lifecycle
+- Easy backup/migration — one directory to copy
+- Clear .gitignore boundary — one self-contained `.gitignore` file

@@ -7,9 +7,8 @@
 ## 系统要求
 
 - **Cursor**（任意版本，支持 Rules 和 Skills）
-- **macOS / Linux**（Windows 支持理论上有，需调整路径）
-- **Bash 4+**（`sm-project-key.sh` 依赖 `md5sum`，macOS 用 `md5`）
-- 网络（首次安装需克隆仓库）
+- **macOS / Linux**（Windows 需调整路径）
+- **Bash 4+**（`sm-project-key.sh` 依赖 `md5`，macOS 和 Linux 均内置）
 
 ---
 
@@ -31,19 +30,19 @@ bash install.sh
 
 安装脚本会做以下事情：
 
-1. **复制 skill 目录** → `~/.cursor/skills/session-memory/`（Cursor Skills 扫描路径）
-2. **创建记忆存储根目录** → `$MEMORY_ROOT/sessions/`（默认在 SkillForge 的 memory 下）
+1. **复制 skill 目录** → `~/.cursor/skills/session-memory/`
+2. **创建记忆存储根目录** → `~/.cursor/session-memory/memory/sessions/`
 3. **初始化全局记忆目录** → `_global/`（INDEX.md + CORE.md 模板）
-4. **添加 .gitignore** → 在 SkillForge 根目录加入 `memory/sessions/` 忽略规则
-5. **Smoke test** → 运行 `sm-project-key.sh` 验证路径计算正确
+4. **生成自带的 .gitignore** → 防止误提交记忆数据
+5. **Smoke test** → 验证路径计算正确
 
 成功输出示例：
 
 ```
 ✓ copied ./skill → ~/.cursor/skills/session-memory
 ✓ scripts made executable
-✓ memory root: /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/
-✓ added memory/sessions/ to /Users/vivx/cursor/digital-human/skills/SKILLFORGE/.gitignore
+✓ created ~/.cursor/session-memory/memory/.gitignore
+✓ memory root: ~/.cursor/session-memory/memory/sessions/
 === smoke test ===
 7verse-ug@a3f2e1b9
 Install complete. Restart Cursor to load the skill.
@@ -51,19 +50,19 @@ Install complete. Restart Cursor to load the skill.
 
 ### 第三步：重启 Cursor
 
-重启 Cursor IDE，使 Skill 在 Rules 面板中可见。
+重启 Cursor IDE，使 Skill 生效。
 
 ---
 
 ## 验证是否生效
 
-打开 Cursor，选一个项目目录（如下 `/Users/vivx/cursor/7verse-ug`），对 Agent 说：
+打开 Cursor，选一个项目目录，对 Agent 说：
 
 ```
 你好，记住这个项目的目标是做一个 linktree crawler。
 ```
 
-然后对 Agent 说：
+然后问：
 
 ```
 我们的技术选型是什么？
@@ -79,10 +78,10 @@ Install complete. Restart Cursor to load the skill.
 bash install.sh --uninstall
 ```
 
-**注意**：这只会移除 Skill 本身，**不会**删除记忆数据。如需清除所有记忆：
+这只会移除 Skill 本身，**不会**删除记忆数据。如需清除所有记忆：
 
 ```bash
-rm -rf /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/
+rm -rf ~/.cursor/session-memory/
 ```
 
 ---
@@ -95,7 +94,7 @@ rm -rf /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/
 
 ### Q: Cursor 没有显示 Skill
 
-确保安装脚本输出的 `~/.cursor/skills/session-memory` 存在。也可以手动检查：
+确保安装脚本输出的 `~/.cursor/skills/session-memory` 存在：
 
 ```bash
 ls ~/.cursor/skills/session-memory/
@@ -103,15 +102,13 @@ ls ~/.cursor/skills/session-memory/
 
 ### Q: 记忆没有持久化
 
-检查 `MEMORY_ROOT` 目录是否存在且有写入权限：
+检查目录是否存在且有写入权限：
 
 ```bash
-ls -la /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/
+ls -la ~/.cursor/session-memory/memory/sessions/
 ```
 
 ### Q: 想指定其他记忆存储路径
-
-在运行安装脚本前设置环境变量：
 
 ```bash
 export MEMORY_ROOT=/你的/自定义/路径

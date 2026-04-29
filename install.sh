@@ -10,7 +10,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC="$SCRIPT_DIR/skill"
 DEST="${HOME}/.cursor/skills/session-memory"
-MEMORY_ROOT="${MEMORY_ROOT:-/Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory}"
+MEMORY_ROOT="${MEMORY_ROOT:-$HOME/.cursor/session-memory/memory}"
 
 ACTION="install"
 [[ "${1:-}" == "--uninstall" ]] && ACTION="uninstall"
@@ -22,8 +22,8 @@ if [[ "$ACTION" == "uninstall" ]]; then
   else
     echo "(not installed at $DEST)"
   fi
-  echo "Note: memory data at $MEMORY_ROOT/sessions/ is NOT removed."
-  echo "To purge memory: rm -rf \"$MEMORY_ROOT/sessions\""
+  echo "Note: memory data at $MEMORY_ROOT/ is NOT removed."
+  echo "To purge memory: rm -rf \"$MEMORY_ROOT\""
   exit 0
 fi
 
@@ -48,23 +48,23 @@ echo "✓ copied $SRC → $DEST"
 chmod +x "$SRC"/scripts/*.sh
 echo "✓ scripts made executable"
 
-# Ensure memory root exists
+# Ensure memory root exists and add its own .gitignore
+mkdir -p "$MEMORY_ROOT"
+if [[ ! -f "$MEMORY_ROOT/.gitignore" ]]; then
+  cat > "$MEMORY_ROOT/.gitignore" <<'EOF'
+# Session Memory — never commit memory data
+*/
+*.md
+EOF
+  echo "✓ created $MEMORY_ROOT/.gitignore"
+fi
+
 mkdir -p "$MEMORY_ROOT/sessions"
 echo "✓ memory root: $MEMORY_ROOT/sessions/"
-
-# Add gitignore for sessions in SkillForge if missing
-SF_ROOT="$(dirname "$MEMORY_ROOT")"
-if [[ -d "$SF_ROOT/.git" ]] || [[ -f "$SF_ROOT/.gitignore" ]]; then
-  GI="$SF_ROOT/.gitignore"
-  if ! grep -q '^memory/sessions' "$GI" 2>/dev/null; then
-    echo 'memory/sessions/' >> "$GI"
-    echo "✓ added memory/sessions/ to $GI"
-  fi
-fi
 
 # Smoke test
 echo
 echo "=== smoke test ==="
 bash "$SRC/scripts/sm-project-key.sh" "$PWD"
 echo
-echo "Install complete. Restart Cursor to load the skill, or invoke via /session-memory."
+echo "Install complete. Restart Cursor to load the skill."

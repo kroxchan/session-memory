@@ -7,7 +7,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-: "${MEMORY_ROOT:=/Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory}"
+: "${MEMORY_ROOT:=$HOME/.cursor/session-memory/memory}"
 
 QUERY=""
 PROJECT_KEY=""

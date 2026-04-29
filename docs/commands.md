@@ -136,7 +136,7 @@ bash ~/.cursor/skills/session-memory/scripts/sm-project-key.sh "$(pwd)"
 ```bash
 cat ~/.cursor/skills/session-memory/scripts/sm-project-key.sh
 # 或直接
-cat /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/_global/INDEX.md
+cat ~/.cursor/session-memory/memory/sessions/_global/INDEX.md
 ```
 
 ### 查看某项目的 CORE
@@ -144,7 +144,7 @@ cat /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/_global/I
 ```bash
 # 先算 project key
 KEY=$(bash ~/.cursor/skills/session-memory/scripts/sm-project-key.sh /Users/vivx/cursor/7verse-ug)
-cat /Users/vivx/cursor/digital-human/skills/SKILLFORGE/memory/sessions/projects/$KEY/CORE.md
+cat ~/.cursor/session-memory/memory/sessions/projects/$KEY/CORE.md
 ```
 
 ---
