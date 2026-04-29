@@ -1,6 +1,6 @@
 ---
 name: session-memory
-description: Project-scoped persistent memory with hierarchical indexing. Use every turn — read INDEX.md first (mandatory, low-cost), drill down to detail files only when relevant. Auto-capture requirements/decisions mentioned by user, summarize long sessions, survive /clear and new windows. Works across all projects under /Users/vivx/cursor/.
+description: Project-scoped persistent memory with hierarchical indexing. Use every turn — read INDEX.md first (mandatory, low-cost), drill down to detail files only when relevant. Auto-capture requirements/decisions mentioned by user, summarize long sessions, survive /clear and new windows. Works with Cursor, Codex, Claude Code, and any agentic coding tool.
 ---
 
 # Session Memory
@@ -31,7 +31,7 @@ $MEMORY_ROOT/sessions/
             └── YYYY-MM-DD-<topic>.md
 ```
 
-`$MEMORY_ROOT` defaults to `~/.cursor/session-memory/memory`. Can be overridden with the `MEMORY_ROOT` env var.
+`$MEMORY_ROOT` defaults to `~/.cursor/session-memory/memory`. Can be overridden with the `MEMORY_ROOT` env var to fit any tool's directory structure.
 
 ## Every turn — mandatory protocol
 
