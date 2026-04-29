@@ -23,7 +23,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -z "$QUERY" ]] && { echo "ERROR: query required" >&2; exit 1; }
-[[ -z "$PROJECT_KEY" ]] && PROJECT_KEY="$(bash "$SCRIPT_DIR/sm-project-key.sh")"
+[[ -z "$PROJECT_KEY" ]] && PROJECT_KEY="$(bash "$SCRIPT_DIR/sm-project-key.sh" "$PWD")"
 
 GLOBAL_DIR="$MEMORY_ROOT/sessions/_global"
 PROJECT_DIR="$MEMORY_ROOT/sessions/projects/$PROJECT_KEY"

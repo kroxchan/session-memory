@@ -68,3 +68,18 @@ echo "=== smoke test ==="
 bash "$SRC/scripts/sm-project-key.sh" "$PWD"
 echo
 echo "Install complete. Restart Cursor to load the skill."
+
+# Optional: run test suite if bats is available
+if command -v bats >/dev/null 2>&1; then
+  echo
+  echo "=== bats found — running test suite ==="
+  if bash "$SCRIPT_DIR/tests/run.sh" 2>&1; then
+    echo "All tests passed."
+  else
+    echo "Tests failed. See above for details."
+  fi
+else
+  echo
+  echo "(bats not found — run 'brew install bats-core' or 'sudo apt-get install bats'"
+  echo " to enable tests, then: bash tests/run.sh)"
+fi

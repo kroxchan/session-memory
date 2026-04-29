@@ -12,10 +12,13 @@ set -euo pipefail
 WORKSPACE="${1:-$PWD}"
 
 # Resolve to absolute canonical path (handles ~, symlinks)
+# Order of preference: realpath (Linux) → readlink -f (macOS+Linux) → cd+pwd
 if command -v realpath >/dev/null 2>&1; then
   WORKSPACE="$(realpath "$WORKSPACE")"
+elif command -v readlink >/dev/null 2>&1 && readlink -f "$WORKSPACE" >/dev/null 2>&1; then
+  WORKSPACE="$(readlink -f "$WORKSPACE")"
 else
-  WORKSPACE="$(cd "$WORKSPACE" && pwd -P)"
+  WORKSPACE="$(cd "$WORKSPACE" && pwd -L)"
 fi
 
 BASENAME="$(basename "$WORKSPACE")"

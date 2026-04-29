@@ -84,12 +84,23 @@ Always use `scripts/sm-write.sh` which:
 3. Uses tmp file + rename to prevent partial writes
 
 ```bash
+# Multi-line body — use stdin (recommended)
+echo "All HTTP handlers must log traceID to structured log." \
+  | bash scripts/sm-write.sh \
+      --project-key 7verse-ug@a3f2e1b9 \
+      --file requirements.md \
+      --title "All handlers log traceID" \
+      --summary "每个 HTTP handler 入口记录 traceID" \
+      --body-stdin
+
+# Single-line body — use --body
 bash scripts/sm-write.sh \
-  --project-key <key> \
-  --file requirements.md \
-  --title "All handlers log traceID" \
-  --summary "每个 HTTP handler 入口要记录 traceID 到结构化日志" \
-  --body "<full markdown body>"
+  --project-key 7verse-ug@a3f2e1b9 \
+  --file decisions.md \
+  --title "Use Redis not Memcached" \
+  --summary "Session 存储选型 Redis" \
+  --body "We use Redis instead of Memcached for session store." \
+  --current
 ```
 
 ## Memory conflict resolution
@@ -134,3 +145,14 @@ Following Liu et al. 2023:
 - `references/templates/INDEX.md.tpl` — new project index template
 - `references/templates/CORE.md.tpl` — new project core template
 - `references/design-notes.md` — design rationale
+
+## Script reference
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/sm-project-key.sh` | Compute `basename@md5-8` from workspace path |
+| `scripts/sm-bootstrap.sh` | Initialize project dirs; print CORE + INDEX |
+| `scripts/sm-write.sh` | Atomic append + INDEX sync |
+| `scripts/sm-recall.sh` | Keyword search across sessions/ + facts/ |
+| `scripts/sm-compress.sh` | Save long-session summary to sessions/ |
+| `scripts/sm-status.sh` | Show memory file sizes and timestamps |
